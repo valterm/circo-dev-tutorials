@@ -1,0 +1,53 @@
+version: '3'
+services:
+  webserver:
+    container_name: amp-apache-php
+    build: # Build the image from the docker file
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    networks:
+      - amp-network # Custom network for better isolation
+    depends_on:
+      - database # The index files need to read from the database, so it should be created first
+    volumes:
+      - ./site:/var/www/html # Map the site directory to allow editing of the site outside of the container
+
+  database:
+    container_name: amp-mysql-server
+    image: mysql:latest
+    environment: # Set up the environment variables to access the db
+      MYSQL_ROOT_PASSWORD: supersecretrootpassword
+      MYSQL_DATABASE: AMPDB
+      MYSQL_USER: user
+      MYSQL_PASSWORD: supersecretuserpassword
+    ports:
+      - 3306:3306 # Host port can be anything; container port must be 3306, the default mysql port
+    networks:
+      - amp-network
+    volumes:
+      - db-data:/var/lib/mysql # Create a volume to save the data from the container
+
+  admin:
+    container_name: amp-pma
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 3000:80 # The web UI runs on container port 80, map host port 3000 to it
+    environment: # Configure the environtment variables for access to the interface
+      PMA_HOST: database
+      PMA_USER: user
+      PMA_PASSWORD: supersecretuserpassword
+    networks:
+      - amp-network
+    volumes:
+      - pma-data:/etc/phpmyadmin
+
+networks: # Create custom network
+  amp-network:
+    name: amp-network
+    driver: bridge
+
+volumes: # Create volume for pma and the db
+  db-data:
+  pma-data:
