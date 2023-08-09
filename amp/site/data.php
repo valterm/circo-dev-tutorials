@@ -1,10 +1,10 @@
 <?php
-// Database connection settings
-$host = '10.147.137.211'; // Replace with your MySQL host
+// Database connection settings - replace with your own values defined in the docker-compose.yml file
+$host = 'database'; // Replace with your MySQL host - in this case, the name of the docker compose service
 $username = 'user'; // Replace with your MySQL username
 $password = 'supersecretuserpassword'; // Replace with your MySQL password
 $dbname = 'AMPDB'; // Replace with your MySQL database name
-$port = '3306';
+$port = '3306'; // Replace with your MySQL port
 
 // Create a database connection
 $connection = new mysqli($host, $username, $password, $dbname, $port);
