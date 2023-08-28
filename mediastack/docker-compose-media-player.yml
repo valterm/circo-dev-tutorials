@@ -1,0 +1,26 @@
+version: "3"
+services:
+  tautulli:
+    image: ghcr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - /path/to/your/config/tautulli:/config
+    ports:
+      - 8181:8181
+    restart: unless-stopped
+  plex:
+    image: ghcr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+    volumes:
+      - /path/to/your/config/plex:/config
+      - /path/to/your/library:/media_library
+    restart: unless-stopped

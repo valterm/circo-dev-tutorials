@@ -1,0 +1,124 @@
+version: '3'
+services:
+  vpn:
+    container_name: 'vpn'
+    image: valtimalti/openvpn-client:latest
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    network_mode: bridge
+    ports:
+      - 8080:8080
+      - 9117:9117
+      - 6767:6767
+      - 8686:8686
+      - 7878:7878
+      - 8989:8989
+    environment:
+      - LOCAL_NETWORK=192.168.0.0/24
+    volumes:
+      - '/path/to/your/config:/config'
+      
+qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:14.3.9
+    restart: 'unless-stopped'
+    container_name: 'qbittorrent'
+    depends_on:
+      - vpn
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+      - WEBUI_PORT=8080
+    volumes:
+      - /path/to/your/config/qbittorrent/config:/config
+      - /path/to/your/library/downloads:/downloads
+    network_mode: service:vpn
+
+  jackett:
+    image: 'linuxserver/jackett'
+    restart: 'unless-stopped'
+    container_name: 'jackett'
+    depends_on:
+      - vpn
+    volumes: 
+      - /path/to/your/config/jackett/config:/config
+      - /path/to/your/library/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    network_mode: service:vpn
+  
+  bazarr:
+    image: 'linuxserver/bazarr'
+    restart: 'unless-stopped'
+    container_name: 'bazarr'
+    depends_on:
+      - vpn
+      - jackett
+      - qbittorrent
+    volumes:
+      - /path/to/your/config/bazarr:/config
+      - /path/to/your/library/movies:/movies
+      - /path/to/your/library/tvshows:/tvshows
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    network_mode: service:vpn
+
+  lidarr:
+    image: 'linuxserver/lidarr'
+    restart: 'unless-stopped'
+    container_name: 'lidarr'
+    depends_on:
+      - vpn
+      - jackett
+      - qbittorrent
+    volumes:
+      - /path/to/your/config/lidarr/config:/config
+      - /path/to/your/library/downloads:/downloads
+      - /path/to/your/library/music:/music
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    network_mode: service:vpn
+    
+  radarr:
+    image: 'linuxserver/radarr'
+    restart: 'unless-stopped'
+    container_name: 'radarr'
+    depends_on:
+      - vpn
+      - jackett
+      - qbittorrent
+    volumes:
+      - /path/to/your/config/radarr/config:/config
+      - /path/to/your/library/movies:/data/movies
+      - /path/to/your/library/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    network_mode: service:vpn
+
+  sonarr:
+    image: 'linuxserver/sonarr'
+    restart: 'unless-stopped'
+    container_name: 'sonarr'
+    depends_on:
+      - vpn
+      - jackett
+      - qbittorrent
+    volumes:
+      - /path/to/your/config/sonarr/config:/config
+      - /path/to/your/library/tvshows:/data/tvshows
+      - /path/to/your/library/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Vienna
+    network_mode: service:vpn
