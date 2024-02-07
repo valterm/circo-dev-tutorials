@@ -122,3 +122,15 @@ qbittorrent:
       - PGID=1000
       - TZ=Europe/Vienna
     network_mode: service:vpn
+
+overseerr:
+    image: sctx/overseerr
+    container_name: overseerr-sevenseas
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Europe/Vienna
+      - PORT=5055
+    volumes:
+      - /path/to/your/overseerr/config:/app/config
+    restart: unless-stopped
+    network_mode: service:vpn
