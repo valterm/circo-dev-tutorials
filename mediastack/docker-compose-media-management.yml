@@ -7,7 +7,6 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun
-    network_mode: bridge
     ports:
       - 8080:8080
       - 9117:9117
@@ -122,6 +121,7 @@ qbittorrent:
       - PGID=1000
       - TZ=Europe/Vienna
     network_mode: service:vpn
+<<<<<<< HEAD
 
 overseerr:
     image: sctx/overseerr
@@ -134,3 +134,5 @@ overseerr:
       - /path/to/your/overseerr/config:/app/config
     restart: unless-stopped
     network_mode: service:vpn
+=======
+>>>>>>> refs/remotes/origin/master
